@@ -1,0 +1,31 @@
+import pandas as pd
+
+# Sample input data structure
+data = {
+    'Date': ['2024-01-01', '2024-01-02', '2024-01-03'],
+    'Distance Traveled (km)': [50, 75, 30],
+    'Driving Condition': ['City', 'Highway', 'City'],
+    'Energy Consumption Rate (kWh/km)': [0.20, 0.15, 0.20],
+    'Electricity Source': ['Grid', 'Renewable', 'Grid'],
+    'Carbon Intensity (kg CO2/kWh)': [0.82, 0.10, 0.82]
+}
+
+# Load input data from a CSV file into a pandas DataFrame
+# df = pd.read_csv('input_data.csv')
+
+# Create a DataFrame from the sample input data
+df = pd.DataFrame(data)
+
+# Define constants
+CHARGING_EFFICIENCY = 0.90
+AVERAGE_ICE_VEHICLE_EMISSIONS = 0.135
+INCENTIVE_MULTIPLIER = 1.2  # adjust this value based on the incentive
+
+# Perform calculations
+df['Effective Energy Consumption (kWh)'] = (df['Distance Traveled (km)'] * df['Energy Consumption Rate (kWh/km)']) / CHARGING_EFFICIENCY
+df['Emissions Avoided (kg CO2)'] = (df['Distance Traveled (km)'] * AVERAGE_ICE_VEHICLE_EMISSIONS) - (df['Effective Energy Consumption (kWh)'] * df['Carbon Intensity (kg CO2/kWh)'])
+df['Reward Points'] = df['Emissions Avoided (kg CO2)'].apply(lambda x: max(x, 0) * 10)
+df['Adjusted Reward Points'] = df['Reward Points'] * INCENTIVE_MULTIPLIER
+
+# Save the calculated results into a new CSV file
+df.to_csv('output_data.csv', index=False)
